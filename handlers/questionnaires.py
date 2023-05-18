@@ -6,7 +6,7 @@ from config.log_def import *
 from models.SQLite import PersonSQLite, QuestionnairesSQLite
 # from main import bot, authorization_command_plus_one
 from models.data_classes import Persons, Questionnaires
-from models.keybords import keyboard_authorization, keyboard_specialization
+from models.keybords import *
 
 tag = "questionare"
 status = "debug"
@@ -46,23 +46,46 @@ def save_new_questionare(message, bot):
 
 def list_questionnaire(message, bot):
     function_name = "set_new_question"
-    # set_func(function_name, tag, status)
-    set_func(function_name, tag)
+    set_func(function_name, tag, status)
+    # set_func(function_name, tag)
 
     questioner = QuestionnairesSQLite()
     data = questioner.get_bd(Questionnaires)
-    result = "Доступные анкеты"
+    result = "Доступные анкеты\n"
+    keyboard_questionnaires = types.ReplyKeyboardMarkup(row_width=2)
+
     for block in data:
         result += f"{block[0]}) {block[1]}\n"
-    bot.send_message(message.chat.id, f'{result}', reply_markup=None)
-    bot.send_message(message.chat.id, "Если хотите начать прохождение нажмите на кнопки с названием этой анкеты")
+        keyboard_questionnaires.add(f"{block[0]}-{block[1]}")
+    bot.send_message(message.chat.id, f'{result}', reply_markup=remove_keyboard)
+    return keyboard_questionnaires
 
+
+def get_list_of_question(need_id, message, bot):
+    function_name = "get_list_of_question"
+    set_func(function_name, tag, status)
+
+    questioner = QuestionnairesSQLite()
+    data = questioner.get_need_question(need_id)
+    set_inside_func(data, function_name, tag)
+
+    path = data[2]
+
+    with open(path, 'r') as file:
+        result = file.read()
+
+    list_of_question = result.split("\n")
+
+    return list_of_question
 
 
 if __name__ == '__main__':
-    quest = QuestionnairesSQLite()
-    last_id = quest.get_last_id()
-    print(last_id)
+    pass
+    # get_one_question(2)
+
+    # quest = QuestionnairesSQLite()
+    # last_id = quest.get_last_id()
+    # print(last_id)
 
 
 

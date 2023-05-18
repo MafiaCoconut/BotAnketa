@@ -134,6 +134,15 @@ class QuestionnairesSQLite(SQLite):
         self.cursor.execute(sqlite_insert_query, args)
         self.connection.commit()
 
+    def get_need_question(self, need_id):
+        function_name = "get_need_question"
+        set_func(function_name, self.tag)
+
+        self.cursor.execute(f"SELECT * FROM questionnaires WHERE id={need_id}")
+        data = self.cursor.fetchone()
+        return data
+
+
 def main():
     sql = SQLite("../data/db.sqlite")
 

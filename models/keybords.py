@@ -11,15 +11,16 @@ keyboard_specialization.add(types.KeyboardButton('specialization_2'))
 keyboard_specialization.add(types.KeyboardButton('specialization_3'))
 
 
-triple_answer = types.ReplyKeyboardMarkup(row_width=2)
-keyboard_specialization.add(types.KeyboardButton('Хорошие'))
-keyboard_specialization.add(types.KeyboardButton('Удовлетворительные'))
-keyboard_specialization.add(types.KeyboardButton('Неудовлетворительные'))
+triple_answer = types.ReplyKeyboardMarkup(row_width=1)
+triple_answer.add(types.KeyboardButton('Хорошие'))
+triple_answer.add(types.KeyboardButton('Удовлетворительные'))
+triple_answer.add(types.KeyboardButton('Неудовлетворительные'))
 
 
-quad_answer = types.ReplyKeyboardMarkup(row_width=2)
-keyboard_specialization.add(types.KeyboardButton('Полностью обеспечены'))
-keyboard_specialization.add(types.KeyboardButton('Частично обеспечены'))
-keyboard_specialization.add(types.KeyboardButton('Слабо обеспечены'))
-keyboard_specialization.add(types.KeyboardButton('Не обеспечены'))
+quad_answer = types.ReplyKeyboardMarkup(row_width=1)
+quad_answer.add(types.KeyboardButton('Полностью обеспечены'))
+quad_answer.add(types.KeyboardButton('Частично обеспечены'))
+quad_answer.add(types.KeyboardButton('Слабо обеспечены'))
+quad_answer.add(types.KeyboardButton('Не обеспечены'))
 
+remove_keyboard = types.ReplyKeyboardRemove()
