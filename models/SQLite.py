@@ -5,7 +5,7 @@ from dataclasses import asdict, astuple, dataclass
 from config import settings
 from config.log_def import *
 
-# tag = "SQLITE"
+tag = "SQLITE_all"
 
 
 class SQLite:
@@ -92,6 +92,14 @@ class PersonSQLite(SQLite):
         except:
             set_inside_func("Человек уже есть в БД", function_name, self.tag)
 
+    def get_data_from_id(self, need_id):
+        function_name = "get_id"
+        set_func(function_name, self.tag)
+
+        self.cursor.execute(f"SELECT * FROM persons WHERE id={need_id}")
+        data = self.cursor.fetchone()
+        return data
+
 
 class QuestionnairesSQLite(SQLite):
     def __init__(self):
@@ -141,6 +149,15 @@ class QuestionnairesSQLite(SQLite):
         self.cursor.execute(f"SELECT * FROM questionnaires WHERE id={need_id}")
         data = self.cursor.fetchone()
         return data
+
+
+def get_person_data_from_id(need_id):
+    function_name = "get_id"
+    set_func(function_name, tag)
+    person = PersonSQLite()
+    data = person.get_data_from_id(need_id)
+    person.turn_off()
+    return data
 
 
 def main():

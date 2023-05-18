@@ -6,6 +6,8 @@ from config.log_def import *
 from handlers.authorization import get_fio, get_specialization
 from handlers.questionnaires import save_new_questionare, list_questionnaire, get_list_of_question
 from models.keybords import *
+import pandas as pd
+from models.SQLite import get_person_data_from_id
 
 # from selenium_group.selenium_main import get_data
 
@@ -17,6 +19,7 @@ admin_ids = ['603789543', ]
 count_questionnaire = 1
 list_of_question = []
 answers = []
+path = "data/answers.xlsx"
 
 
 def admin_only(func):
@@ -83,7 +86,27 @@ def work_with_questionnaire(message):
     else:
         bot.send_message(message.chat.id, "Ваши данные сохранены", reply_markup=remove_keyboard)
         set_inside_func(answers, function_name, tag)
+        save_answers(message)
 
+
+@bot.message_handler(commands=['test'])
+def save_answers(message):
+    function_name = "save_answers"
+    set_func(function_name, tag, status)
+
+    df = pd.read_excel(path)
+    global answers
+    # answers = ['Хорошие', 'Слабо обеспечены', 'Полностью обеспечены']
+
+    data = get_person_data_from_id(message.chat.id)
+    fio = f"{data[3]} {data[1]} {data[2]}"
+
+    set_inside_func(f"FIO: {fio}", function_name, tag)
+    set_inside_func(data, function_name, tag)
+    # set_inside_func(data, function_name, tag)
+
+    df[fio] = answers
+    df.to_excel(path, index=False)
 
 
 def one_question(message):
