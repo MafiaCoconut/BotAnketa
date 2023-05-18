@@ -14,12 +14,12 @@ from models.SQLite import get_person_data_from_id
 bot = telebot.TeleBot("5755365226:AAE9U5AtTrnUpPl5K1EIZxdOgLpl-4AFWDI")
 tag = "main"
 status = "debug"
-authorization_command = '1'
+authorization_command = '0'
 admin_ids = ['603789543', ]
 count_questionnaire = 1
 list_of_question = []
+id_question = None
 answers = []
-path = "data/answers.xlsx"
 
 
 def admin_only(func):
@@ -58,13 +58,14 @@ def main_menu(message):
 
 def work_with_questionnaire(message):
     function_name = "work_with_questionnaire"
-    set_func(function_name, tag)
+    set_func(function_name, tag, status)
 
-    global count_questionnaire, list_of_question, answers
+    global count_questionnaire, list_of_question, answers, id_question
     flag_end = False
-    need_id = message.text[0]
+    # need_id = message.text[0]
     if count_questionnaire == 1:
-        list_of_question = get_list_of_question(need_id, message, bot)
+        id_question = message.text[0]
+        list_of_question = get_list_of_question(id_question, message, bot)
     else:
         answers.append(message.text)
 
@@ -89,24 +90,31 @@ def work_with_questionnaire(message):
         save_answers(message)
 
 
+def data_to_default():
+    global answers, count_questionnaire, list_of_question, id_question
+    answers = []
+    count_questionnaire = 1
+    list_of_question = []
+    id_question = None
+
+
 @bot.message_handler(commands=['test'])
 def save_answers(message):
     function_name = "save_answers"
     set_func(function_name, tag, status)
 
-    df = pd.read_excel(path)
     global answers
-    # answers = ['Хорошие', 'Слабо обеспечены', 'Полностью обеспечены']
 
     data = get_person_data_from_id(message.chat.id)
     fio = f"{data[3]} {data[1]} {data[2]}"
 
-    set_inside_func(f"FIO: {fio}", function_name, tag)
-    set_inside_func(data, function_name, tag)
-    # set_inside_func(data, function_name, tag)
+    path = f"{path_to_answers}{id_question}.xlsx"
 
+    df = pd.read_excel(path)
     df[fio] = answers
     df.to_excel(path, index=False)
+
+    data_to_default()
 
 
 def one_question(message):
@@ -114,7 +122,7 @@ def one_question(message):
     set_func(function_name, tag, status)
 
     text = list_of_question[count_questionnaire].split(' ')
-    set_inside_func(' '.join(text), function_name, tag)
+    # set_inside_func(' '.join(text), function_name, tag)
     if text[0][4] == '3':
         bot.send_message(message.chat.id, ' '.join(text[1:]), reply_markup=triple_answer)
     elif text[0][4] == '4':

@@ -1,4 +1,5 @@
 import telebot
+import pandas as pd
 
 from config import settings
 from config.help_file import *
@@ -21,6 +22,19 @@ def save_data(message, bot, link):
         file.write(downloaded_file)
 
 
+def get_questions(data):
+    function_name = "get_questions"
+    set_func(function_name, tag, status)
+
+    list_of_questions = []
+    for block in data:
+        text = block.split(' ')
+        if len(text[0]) == 5:
+            list_of_questions.append(block)
+
+    return list_of_questions
+
+
 def save_new_questionare(message, bot):
     function_name = "set_new_question"
     set_func(function_name, tag, status)
@@ -36,12 +50,20 @@ def save_new_questionare(message, bot):
 
     context = content.split("\n")
     title = context[0]
+
+    list_of_question = get_questions(context)
+    data = {'Вопросы': list_of_question}
+    df = pd.DataFrame(data)
+    path = f"{path_to_answers}{need_id}"
+    set_inside_func(f"path: {path}", function_name, tag)
+    df.to_excel(f"{path_to_answers}{need_id}.xlsx", index=False)
+
     need_id = str(need_id)
     model = Questionnaires(id=need_id, title=title, link=link)
     questioner.set_data(model)
 
-    bot.reply_to(message.chat.id, f'Содержимое файла:\n{content}', reply_markup=None)
-    set_inside_func(f"Файл: {title} успешно сохранён", function_name, tag)
+    bot.send_message(message.chat.id, f'Содержимое файла:\n{content}', reply_markup=None)
+    set_inside_func(f"Файл: '{title}' успешно сохранён", function_name, tag)
 
 
 def list_questionnaire(message, bot):

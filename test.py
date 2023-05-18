@@ -62,7 +62,7 @@
 
 
 import pandas as pd
-
+from config.help_file import *
 from SQLite import get_person_data_from_id
 
 path = "data/answers.xlsx"
@@ -73,10 +73,13 @@ def create_db():
 
     # Создание нового DataFrame
     # data = {'Name': ['Alice', 'Bob', 'Charlie'], 'Age': [25, 30, 35]}
-    df = pd.DataFrame()
+    data = {'Вопросы': []}
+    df = pd.DataFrame(data)
 
     # Запись данных в файл XLSX
     df.to_excel(path, index=False)
+
+    printi()
 
 
 def main():
@@ -91,16 +94,28 @@ def main():
     # Сохранение изменений в файл XLSX
     df.to_excel(path, index=False)
 
+    printi()
+
 
 def printi():
     df = pd.read_excel(path)
     print(df)
 
+
+def new_list():
+    writer = pd.ExcelWriter(path_to_questions, engine='xlsxwriter')
+
+    # Создание нового листа
+    df1 = pd.DataFrame({'Вопросы': []})
+    df1.to_excel(writer, sheet_name='Заголовок 1')
+
+    writer.save()
+    print(writer)
 if __name__ == '__main__':
-    main()
-    printi()
+    new_list()
+    # main()
+    # printi()
     # create_db()
     # clear()
     # all_none()
-
 
