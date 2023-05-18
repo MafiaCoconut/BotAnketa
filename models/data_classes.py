@@ -14,12 +14,10 @@ class Persons:
     table = 'persons'
 
 
-# @dataclass
-# class Leute:
-#     id: uuid.UUID = field(default_factory=uuid.uuid4)
-#     login: str = field(default="")
-#     password: str = field(default="")
-#     status: str = field(default="user")
-#     state: str = field(default="start")
-#     created: datetime.now = field(default=datetime.now())
-#     table = "leute"
+@dataclass
+class Questionnaires:
+    id: uuid.UUID = field(default_factory=uuid.uuid4)
+    title: str = field(default="")
+    link: str = field(default="")
+    created: datetime.now = field(default=datetime.now())
+    table = "questionnaires"
