@@ -14,23 +14,13 @@ bot = telebot.TeleBot("5755365226:AAE9U5AtTrnUpPl5K1EIZxdOgLpl-4AFWDI")
 tag = "main"
 status = "debug"
 authorization_command = '1'
-admin_ids = ['603789543']
+# admin_ids = ['603789543']
 count_questionnaire = 1
 list_of_question = []
 id_question = None
 answers = []
 
 
-def admin_only(func):
-    def wrapper(message):
-        if message.from_user.id in admin_ids:
-            func(message)
-        else:
-            bot.reply_to(message, "У вас нет прав доступа.")
-    return wrapper
-
-
-@admin_only
 @bot.message_handler(commands=['get_results'])
 def processing_admin_commands(message):
     function_name = "processing_admin_commands"
@@ -43,7 +33,6 @@ def processing_admin_commands(message):
                 bot.register_next_step_handler(message, main_processing_results)
 
 
-@admin_only
 @bot.message_handler(content_types=['document'])
 def set_new_question(message):
     function_name = "set_new_question"
@@ -51,6 +40,20 @@ def set_new_question(message):
 
     if check_admin(message):
         save_new_questionare(message, bot)
+
+
+@bot.message_handler(commands=['start'])
+def start(message):
+    function_name = "start"
+    set_func(function_name, tag, status)
+
+    bot.send_message(message.chat.id, message.chat.id)
+    try:
+        person = get_person_data_from_id(message.chat.id)
+        bot.send_message(message.chat.id, f'Вы уже зарегестрировались {person[3]} {person[2]} {person[1]}', reply_markup=remove_keyboard)
+    except:
+        bot.send_message(message.chat.id, 'Добро пожаловать!', reply_markup=remove_keyboard)
+        authorization(message)
 
 
 def main_processing_results(message):
@@ -63,30 +66,6 @@ def main_processing_results(message):
         with open(path, 'rb') as file:
             bot.send_document(message.chat.id, file, reply_markup=remove_keyboard)
 
-
-# TODO сделать отправку сообщения человеку чтобы он поменял свои данные а не создавал заново
-@bot.message_handler(commands=['start'])
-def start(message):
-    function_name = "start"
-    set_func(function_name, tag, status)
-
-    bot.send_message(message.chat.id, message.chat.id)
-    #TODO Проверка что человек есть в списке
-    try:
-        person = get_person_data_from_id(message.chat.id)
-        bot.send_message(message.chat.id, f'Вы уже зарегестрировались {person[3]} {person[2]} {person[1]}', reply_markup=remove_keyboard)
-    except:
-        bot.send_message(message.chat.id, 'Добро пожаловать!', reply_markup=remove_keyboard)
-        authorization(message)
-
-@bot.message_handler(commands=['send_doc'])
-def send_document(message):
-    # Путь к файлу документа, который нужно отправить
-    document_path = 'path/to/document.pdf'
-
-    # Отправка документа в чат
-    with open(document_path, 'rb') as document:
-        bot.send_document(message.chat.id, document)
 
 @bot.message_handler(commands=['list', 'begin'])
 def main_menu(message):
@@ -202,7 +181,6 @@ if __name__ == '__main__':
     settings.main()
     bot.polling(none_stop=True, timeout=3000000)
 
-# TODO: системы вывода ответов админу
 # TODO: систему удаления анкеты
 # TODO: спец меню для админа
 # TODO:

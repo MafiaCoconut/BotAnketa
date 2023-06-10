@@ -1,5 +1,6 @@
 import telebot
 
+# from main import authorization
 from config import settings
 from config.help_file import *
 from config.log_def import *
@@ -39,19 +40,21 @@ def get_fio(message, bot):
             set_inside_func(flags["fio"], function_name, tag, status)
 
             text = message.text.split()
-            set_inside_func(f"ФИО: {text}", function_name, tag)
+            if len(text) != 3:
+                bot.send_message(message.chat.id, "Вы ввели неправильные данные, попробуйте ещё раз")
+            else:
+                set_inside_func(f"ФИО: {text}", function_name, tag)
 
-            data['first_name'] = text[1]
-            data['middle_name'] = text[2]
-            data['last_name'] = text[0]
+                data['first_name'] = text[1]
+                data['middle_name'] = text[2]
+                data['last_name'] = text[0]
 
-            if len(text) == 3:
-                bot.send_message(message.chat.id, f"Вы уверены что хотите сохранить: {' '.join(text)}",
-                                 reply_markup=keyboard_authorization)
+                if len(text) == 3:
+                    bot.send_message(message.chat.id, f"Вы уверены что хотите сохранить: {' '.join(text)}",
+                                     reply_markup=keyboard_authorization)
 
-            flags["fio"] += 1
+                flags["fio"] += 1
 
-        # TODO нужно создать систему сохранения данных
         case 3:
             set_inside_func(flags["fio"], function_name, tag, status)
 
@@ -103,7 +106,8 @@ def get_specialization(message, bot):
                 case "Нет, я хочу изменить":
                     bot.send_message(message.chat.id, "Выберите вашу специальность",
                                      reply_markup=keyboard_specialization)
-                    flags["fio"] = 2
+                    flags["specialization"] = 2
+
     return None
 
 
