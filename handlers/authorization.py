@@ -26,6 +26,7 @@ def get_fio(message, bot):
     function_name = "get_fio"
     set_func(function_name, tag, status)
 
+    # TODO условие что человек ввёл меньше данных чем нужно
     global flags, data
     match flags["fio"]:
         case 1:
@@ -57,7 +58,6 @@ def get_fio(message, bot):
             text = message.text
             match text:
                 case "Да, я хочу сохранить":
-
                     return True
                 case "Нет, я хочу изменить":
                     bot.send_message(message.chat.id, "Введите ваше ФИО через пробел", reply_markup=None)
@@ -113,13 +113,13 @@ def save_data(message):
 
     global data
     person = PersonSQLite()
-    args = Persons(id=message.chat.id,
+    args = Persons(id_telegram=str(message.chat.id),
                    first_name=data["first_name"],
                    middle_name=data["middle_name"],
                    last_name=data["last_name"],
                    specialization=data["specialization"])
 
     # TODO убрать эту строчку на релизе
-    person.clear_bd(Persons)
+    # person.clear_bd(Persons)
 
     person.set_person(args)

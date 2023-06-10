@@ -4,18 +4,17 @@ from config import settings
 from config.help_file import *
 from config.log_def import *
 from handlers.authorization import get_fio, get_specialization
+# from handlers.admin import main_processing_results
 from handlers.questionnaires import save_new_questionare, list_questionnaire, get_list_of_question
 from models.keybords import *
 import pandas as pd
 from models.SQLite import get_person_data_from_id
 
-# from selenium_group.selenium_main import get_data
-
 bot = telebot.TeleBot("5755365226:AAE9U5AtTrnUpPl5K1EIZxdOgLpl-4AFWDI")
 tag = "main"
 status = "debug"
-authorization_command = '0'
-admin_ids = ['603789543', ]
+authorization_command = '1'
+admin_ids = ['603789543']
 count_questionnaire = 1
 list_of_question = []
 id_question = None
@@ -31,16 +30,56 @@ def admin_only(func):
     return wrapper
 
 
+@admin_only
+@bot.message_handler(commands=['get_results'])
+def processing_admin_commands(message):
+    function_name = "processing_admin_commands"
+    set_func(function_name, tag)
+
+    bot.send_message(message.chat.id, message)
+    match message.text:
+        case "/get_results":
+            main_processing_results(message)
+            bot.register_next_step_handler(message, main_processing_results)
+
+
+@admin_only
+@bot.message_handler(content_types=['document'])
+def set_new_question(message):
+    function_name = "set_new_question"
+    set_func(function_name, tag, status)
+
+    save_new_questionare(message, bot)
+
+
+def main_processing_results(message):
+    # bot.send_message(message, "Выберите анкеты для получения результатов")
+    if message.text == "/get_results":
+        keyboard_questionnaires = list_questionnaire(message, bot)
+        bot.send_message(message.chat.id, "Чтобы получить результаты анкеты, нажмите необходимую кнопку",
+                         reply_markup=keyboard_questionnaires)
+    else:
+        path = f"{path_to_answers}{message.text[0]}.xlsx"
+        with open(path, 'rb') as file:
+            bot.send_document(message.chat.id, file, reply_markup=remove_keyboard)
+
+
 # TODO сделать отправку сообщения человеку чтобы он поменял свои данные а не создавал заново
 @bot.message_handler(commands=['start'])
 def start(message):
     function_name = "start"
     set_func(function_name, tag, status)
 
-    bot.send_message(message.chat.id, 'Добро пожаловать!',
-                     reply_markup=None)
+    bot.send_message(message.chat.id, message.chat.id)
+    #TODO Проверка что человек есть в списке
+
+    # person = get_person_data_from_id(message.chat.id)
+    # bot.send_message(message.chat.id, f'Вы уже зарегестрировались {person[2]} {person[3]} {person[4]}', reply_markup=remove_keyboard)
+# except:
+    bot.send_message(message.chat.id, 'Добро пожаловать!', reply_markup=remove_keyboard)
     authorization(message)
-    # bot.register_next_step_handler(message, authorization)
+
+
 
 
 @bot.message_handler(commands=['list', 'begin'])
@@ -51,7 +90,7 @@ def main_menu(message):
     keyboard_questionnaires = list_questionnaire(message, bot)
     if message.text[1:] == "begin":
         bot.send_message(message.chat.id,
-                         "Если хотите начать прохождение нажмите на кнопки с названием этой анкеты",
+                         "Если хотите начать прохождение нажмите на кнопку с названием этой анкеты",
                          reply_markup=keyboard_questionnaires)
         bot.register_next_step_handler(message, work_with_questionnaire)
 
@@ -62,7 +101,6 @@ def work_with_questionnaire(message):
 
     global count_questionnaire, list_of_question, answers, id_question
     flag_end = False
-    # need_id = message.text[0]
     if count_questionnaire == 1:
         id_question = message.text[0]
         list_of_question = get_list_of_question(id_question, message, bot)
@@ -98,7 +136,6 @@ def data_to_default():
     id_question = None
 
 
-@bot.message_handler(commands=['test'])
 def save_answers(message):
     function_name = "save_answers"
     set_func(function_name, tag, status)
@@ -122,20 +159,10 @@ def one_question(message):
     set_func(function_name, tag, status)
 
     text = list_of_question[count_questionnaire].split(' ')
-    # set_inside_func(' '.join(text), function_name, tag)
     if text[0][4] == '3':
         bot.send_message(message.chat.id, ' '.join(text[1:]), reply_markup=triple_answer)
     elif text[0][4] == '4':
         bot.send_message(message.chat.id, ' '.join(text[1:]), reply_markup=quad_answer)
-
-
-@admin_only
-@bot.message_handler(content_types=['document'])
-def set_new_question(message):
-    function_name = "set_new_question"
-    set_func(function_name, tag, status)
-
-    save_new_questionare(message, bot)
 
 
 def authorization(message):
@@ -153,7 +180,7 @@ def authorization(message):
         case "2":
             if get_specialization(message, bot):
                 authorization_command_plus_one()
-                bot.send_message(message.chat.id, "Вы успешно зарегестрировались", reply_markup=None)
+                bot.send_message(message.chat.id, "Вы успешно зарегестрировались", reply_markup=remove_keyboard)
             else:
                 bot.register_next_step_handler(message, authorization)
 
@@ -168,3 +195,11 @@ def authorization_command_plus_one():
 if __name__ == '__main__':
     settings.main()
     bot.polling(none_stop=True, timeout=3000000)
+
+# TODO: системы вывода ответов админу
+# TODO: систему удаления анкеты
+# TODO: спец меню для админа
+# TODO:
+# TODO:
+# TODO:
+# TODO:
