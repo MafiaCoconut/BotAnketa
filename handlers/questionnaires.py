@@ -17,7 +17,6 @@ def save_data(message, bot, link):
     file_info = bot.get_file(message.document.file_id)
     file_path = file_info.file_path
     downloaded_file = bot.download_file(file_path)
-
     with open(link, 'wb') as file:
         file.write(downloaded_file)
 

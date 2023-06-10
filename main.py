@@ -47,7 +47,6 @@ def start(message):
     function_name = "start"
     set_func(function_name, tag, status)
 
-    bot.send_message(message.chat.id, message.chat.id)
     try:
         person = get_person_data_from_id(message.chat.id)
         bot.send_message(message.chat.id, f'Вы уже зарегестрировались {person[3]} {person[2]} {person[1]}', reply_markup=remove_keyboard)
@@ -89,6 +88,8 @@ def work_with_questionnaire(message):
     if count_questionnaire == 1:
         id_question = message.text[0]
         list_of_question = get_list_of_question(id_question, message, bot)
+        list_of_question.append("end")
+        # print(list_of_question)
     else:
         answers.append(message.text)
 
