@@ -1,5 +1,6 @@
 import telebot
 
+import help_file
 from config import settings
 from config.help_file import *
 from config.log_def import *
@@ -167,6 +168,7 @@ def authorization(message):
             if get_specialization(message, bot):
                 authorization_command_plus_one()
                 bot.send_message(message.chat.id, "Вы успешно зарегестрировались", reply_markup=remove_keyboard)
+                bot.send_message(message.chat.id, help_file.rules)
             else:
                 bot.register_next_step_handler(message, authorization)
 
