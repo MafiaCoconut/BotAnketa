@@ -61,7 +61,6 @@ class PersonSQLite(SQLite):
         self.cursor.execute(f"""
         CREATE TABLE IF NOT EXISTS persons (
         id uuid PRIMARY KEY,
-        id_telegram TEXT,
         first_name TEXT,
         middle_name TEXT,
         last_name TEXT,
@@ -75,14 +74,14 @@ class PersonSQLite(SQLite):
         function_name = "set_person"
         set_func(function_name, self.tag)
 
-        args = [str(model.id), model.id_telegram, model.first_name, model.middle_name, model.last_name, model.specialization, model.created]
+        args = [str(model.id), model.first_name, model.middle_name, model.last_name, model.specialization, model.created]
 
         for i in args:
             print(f"{i}, {type(i)}")
         sqlite_insert_query = f"""
         INSERT INTO {model.table}
-        (id, id_telegram, first_name, middle_name, last_name, specialization, created)
-        VALUES (?, ?, ?, ?, ?, ?, ?);
+        (id, first_name, middle_name, last_name, specialization, created)
+        VALUES (?, ?, ?, ?, ?, ?);
        """
 
         self.cursor.execute(sqlite_insert_query, args)
@@ -92,7 +91,7 @@ class PersonSQLite(SQLite):
         function_name = "get_id"
         set_func(function_name, self.tag)
 
-        self.cursor.execute(f"SELECT * FROM persons WHERE id_telegram={need_id}")
+        self.cursor.execute(f"SELECT * FROM persons WHERE id={need_id}")
         data = self.cursor.fetchone()
         return data
 

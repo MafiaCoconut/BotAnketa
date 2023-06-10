@@ -6,7 +6,6 @@ from datetime import datetime
 @dataclass
 class Persons:
     id: uuid.UUID = field(default_factory=uuid.uuid4)
-    id_telegram: str = field(default="")
     first_name: str = field(default="")
     middle_name: str = field(default="")
     last_name: str = field(default="")

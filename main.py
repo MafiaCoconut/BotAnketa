@@ -4,7 +4,7 @@ from config import settings
 from config.help_file import *
 from config.log_def import *
 from handlers.authorization import get_fio, get_specialization
-# from handlers.admin import main_processing_results
+from handlers.admin import check_admin
 from handlers.questionnaires import save_new_questionare, list_questionnaire, get_list_of_question
 from models.keybords import *
 import pandas as pd
@@ -34,13 +34,13 @@ def admin_only(func):
 @bot.message_handler(commands=['get_results'])
 def processing_admin_commands(message):
     function_name = "processing_admin_commands"
-    set_func(function_name, tag)
+    set_func(function_name, tag, status)
 
-    bot.send_message(message.chat.id, message)
-    match message.text:
-        case "/get_results":
-            main_processing_results(message)
-            bot.register_next_step_handler(message, main_processing_results)
+    if check_admin(message):
+        match message.text:
+            case "/get_results":
+                main_processing_results(message)
+                bot.register_next_step_handler(message, main_processing_results)
 
 
 @admin_only
@@ -49,11 +49,11 @@ def set_new_question(message):
     function_name = "set_new_question"
     set_func(function_name, tag, status)
 
-    save_new_questionare(message, bot)
+    if check_admin(message):
+        save_new_questionare(message, bot)
 
 
 def main_processing_results(message):
-    # bot.send_message(message, "Выберите анкеты для получения результатов")
     if message.text == "/get_results":
         keyboard_questionnaires = list_questionnaire(message, bot)
         bot.send_message(message.chat.id, "Чтобы получить результаты анкеты, нажмите необходимую кнопку",
@@ -72,15 +72,21 @@ def start(message):
 
     bot.send_message(message.chat.id, message.chat.id)
     #TODO Проверка что человек есть в списке
+    try:
+        person = get_person_data_from_id(message.chat.id)
+        bot.send_message(message.chat.id, f'Вы уже зарегестрировались {person[3]} {person[2]} {person[1]}', reply_markup=remove_keyboard)
+    except:
+        bot.send_message(message.chat.id, 'Добро пожаловать!', reply_markup=remove_keyboard)
+        authorization(message)
 
-    # person = get_person_data_from_id(message.chat.id)
-    # bot.send_message(message.chat.id, f'Вы уже зарегестрировались {person[2]} {person[3]} {person[4]}', reply_markup=remove_keyboard)
-# except:
-    bot.send_message(message.chat.id, 'Добро пожаловать!', reply_markup=remove_keyboard)
-    authorization(message)
+@bot.message_handler(commands=['send_doc'])
+def send_document(message):
+    # Путь к файлу документа, который нужно отправить
+    document_path = 'path/to/document.pdf'
 
-
-
+    # Отправка документа в чат
+    with open(document_path, 'rb') as document:
+        bot.send_document(message.chat.id, document)
 
 @bot.message_handler(commands=['list', 'begin'])
 def main_menu(message):

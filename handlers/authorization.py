@@ -113,7 +113,7 @@ def save_data(message):
 
     global data
     person = PersonSQLite()
-    args = Persons(id_telegram=str(message.chat.id),
+    args = Persons(id=str(message.chat.id),
                    first_name=data["first_name"],
                    middle_name=data["middle_name"],
                    last_name=data["last_name"],
