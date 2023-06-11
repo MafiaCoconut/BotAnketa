@@ -29,9 +29,11 @@ def processing_admin_commands(message):
         match message.text:
             case "/get_results":
                 help_file.command_admin_panel = "get_results"
+                set_inside_func("Вызвана функция получения результатов", function_name, tag)
 
             case "/delete":
                 help_file.command_admin_panel = "delete"
+                set_inside_func("Вызвана функция удаления анкеты", function_name, tag)
 
         main_processing_admin_panel(message)
 
@@ -42,6 +44,7 @@ def set_new_question(message):
     set_func(function_name, tag, status)
 
     if check_admin(message):
+        set_inside_func("Прислан документ", function_name, tag)
         save_new_questionare(message, bot)
 
 
@@ -49,6 +52,7 @@ def set_new_question(message):
 def start(message):
     function_name = "start"
     set_func(function_name, tag, status)
+    set_person_text(function_name, tag, message)
 
     try:
         person = get_person_data_from_id(message.chat.id)
@@ -62,7 +66,9 @@ def start(message):
 def help_function(message):
     function_name = "help_function"
     set_func(function_name, tag, status)
+    set_person_text(function_name, tag, message)
 
+    # TODO спец /help для админа
     if check_admin(message):
         pass
     else:
@@ -79,17 +85,23 @@ def main_processing_admin_panel(message):
                 if message.text == "/get_results":
                     get_questionnaires(message, bot)
                     bot.register_next_step_handler(message, main_processing_admin_panel)
+                    set_inside_func("Отправлен список анкет", function_name, tag, status)
+
                 else:
                     path = f"{path_to_answers}{message.text[0]}.xlsx"
                     with open(path, 'rb') as file:
                         bot.send_document(message.chat.id, file, reply_markup=remove_keyboard)
+                    set_inside_func(f"Отправлен файл {path}", function_name, tag)
 
             case "delete":
                 if message.text == "/delete":
                     get_questionnaires(message, bot)
                     bot.register_next_step_handler(message, main_processing_admin_panel)
+                    set_inside_func("Отправлен список анкет", function_name, tag, status)
 
                 elif help_file.delete_count == 0:
+                    set_inside_func("Вызван повторный вопрос на удаление анкеты", function_name, tag, status)
+
                     bot.send_message(message.chat.id, f"Вы уверены, что хотите удалить анкету: {message.text}",
                                      reply_markup=keyboard_yes_no)
                     help_file.delete_count += 1
@@ -111,21 +123,25 @@ def main_processing_admin_panel(message):
                         os.remove(path_question)
 
                         delete_id_questioner(id_questioner)
+                        set_inside_func(f"Удалена анкета {help_file.chose_questioner_to_delete}", function_name, tag)
 
                     elif message.text == "Нет":
                         bot.send_message(message.chat.id, f"Выполнена отмена вызова функции "
                                                           f"{help_file.command_admin_panel}",
                                                           reply_markup=remove_keyboard)
                         help_file.delete_count = 0
+                        set_inside_func("Отмена функции удаления анкеты", function_name, tag)
 
                     else:
                         bot.send_message(message.chat.id, "Вы ввели неправильный формат ответа, повторите попытку ещё "
                                                           "раз")
                         bot.register_next_step_handler(message, main_processing_admin_panel)
+                        set_inside_func(f"Введён неправильный формат ответа: {message.text}", function_name, tag)
 
     else:
         bot.send_message(message.chat.id, f"Выполнена отмена вызова функции {help_file.command_admin_panel}",
                          reply_markup=remove_keyboard)
+        set_inside_func("Отмена функции удаления анкеты", function_name, tag)
 
 
 def work_with_questionnaire(message):
@@ -260,7 +276,6 @@ if __name__ == '__main__':
     settings.main()
     bot.polling(none_stop=True, timeout=3000000)
 
-# TODO: систему удаления анкеты
 # TODO: спец меню для админа
 # TODO: проверка что файл подходит всем условиям
 # TODO: сделать более подробный вывод логов

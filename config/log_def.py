@@ -7,10 +7,13 @@ def set_func(function, tag, status="info"):
         case "debug":   logging.debug(f"[%s] Вызвана функция: {function}", tag)
 
 
-def set_func_and_person(function, tag, message, status="info"):
+def set_person_text(function, tag, message, status="info"):
     match status:
-        case "info":      logging.info(f"[%s] Вызвана функция: ({function}) пользователем: @{message.from_user.username}", tag)
-        case "debug":     logging.debug(f"[%s] Вызвана функция: ({function}) пользователем: @{message.from_user.username}", tag)
+        # case "info":      logging.info(f"[%s] Вызвана функция: ({function}) пользователем: {message.from_user.id}",
+        # tag) case "debug":     logging.debug(f"[%s] Вызвана функция: ({function}) пользователем: {
+        # message.from_user.id}", tag)
+        case "info":     logging.info(f"[%s] |Пользователь: {message.chat.id}|, {message.text}", tag)
+        case "debug":     logging.debug(f"[%s] |Пользователь: {message.chat.id}|, {message.text}", tag)
 
 
 def set_inside_func(data, function, tag, status="info"):
