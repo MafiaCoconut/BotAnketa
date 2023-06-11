@@ -76,8 +76,6 @@ class PersonSQLite(SQLite):
 
         args = [str(model.id), model.first_name, model.middle_name, model.last_name, model.specialization, model.created]
 
-        for i in args:
-            print(f"{i}, {type(i)}")
         sqlite_insert_query = f"""
         INSERT INTO {model.table}
         (id, first_name, middle_name, last_name, specialization, created)

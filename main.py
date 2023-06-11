@@ -15,10 +15,8 @@ bot = telebot.TeleBot("5755365226:AAE9U5AtTrnUpPl5K1EIZxdOgLpl-4AFWDI")
 tag = "main"
 status = "debug"
 authorization_command = '1'
-# admin_ids = ['603789543']
 count_questionnaire = 1
 list_of_question = []
-# id_question = None
 answers = []
 
 
@@ -136,7 +134,6 @@ def work_with_questionnaire(message):
 
     if message.text[0] == "/":
         bot.send_message(message.chat.id, "Вы ввели команду, а не ответ, повторите попытку ещё раз")
-        # flag_right_answer = False
         bot.register_next_step_handler(message, work_with_questionnaire)
 
     else:
@@ -214,7 +211,7 @@ def authorization(message):
     set_func(function_name, tag, status)
 
     # print(message)
-    if message.text in ["/behin", "/help"]:
+    if message.text in ["/begin", "/help"]:
         bot.send_message(message.chat.id, "Вы ввели команду, а не ответ, повторите попытку ещё раз")
         bot.register_next_step_handler(message, authorization)
     else:

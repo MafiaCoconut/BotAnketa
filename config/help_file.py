@@ -13,6 +13,9 @@ path_to_answers = "data/answers/"
 # списка id админов
 list_admins = ['603789543', '991027824']
 
+# счётчик команд для регистрации
+authorization_command = "1"
+
 # тут хранится команда для админ панели
 command_admin_panel = ""  # команда
 
