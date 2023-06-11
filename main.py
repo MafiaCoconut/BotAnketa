@@ -18,7 +18,7 @@ authorization_command = '1'
 # admin_ids = ['603789543']
 count_questionnaire = 1
 list_of_question = []
-id_question = None
+# id_question = None
 answers = []
 
 
@@ -140,12 +140,12 @@ def work_with_questionnaire(message):
         bot.register_next_step_handler(message, work_with_questionnaire)
 
     else:
-        global count_questionnaire, list_of_question, answers, id_question
+        global count_questionnaire, list_of_question, answers
         flag_end = False
         # flag_right_answer = True
         if count_questionnaire == 1:
-            id_question = message.text[0]
-            list_of_question = get_list_of_question(id_question, message, bot)
+            help_file.id_question_for_questioner = message.text[0]
+            list_of_question = get_list_of_question(help_file.id_question_for_questioner, message, bot)
             list_of_question.append("end")
             # print(list_of_question)
         else:
@@ -173,11 +173,11 @@ def work_with_questionnaire(message):
 
 
 def data_to_default():
-    global answers, count_questionnaire, list_of_question, id_question
+    global answers, count_questionnaire, list_of_question
     answers = []
     count_questionnaire = 1
     list_of_question = []
-    id_question = None
+    help_file.id_question_for_questioner = None
 
 
 def save_answers(message):
@@ -189,7 +189,7 @@ def save_answers(message):
     data = get_person_data_from_id(message.chat.id)
     fio = f"{data[3]} {data[1]} {data[2]}"
 
-    path = f"{path_to_answers}{id_question}.xlsx"
+    path = f"{path_to_answers}{help_file.id_question_for_questioner}.xlsx"
 
     df = pd.read_excel(path)
     df[fio] = answers

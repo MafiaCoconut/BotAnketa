@@ -22,6 +22,9 @@ delete_count = 0
 # выбранная анкета для удаления
 chose_questioner_to_delete = ""
 
+# счётчик вопроса для прохождения анкеты
+id_question_for_questioner = None
+
 admin_commands = """Список команд доступных только админу:
 /get_results -  Получить результаты определённой анкеты
 """
