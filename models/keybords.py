@@ -5,6 +5,11 @@ keyboard_authorization.add(types.KeyboardButton('Да, я хочу сохран�
 keyboard_authorization.add(types.KeyboardButton('Нет, я хочу изменить'))
 
 
+keyboard_yes_no = types.ReplyKeyboardMarkup(row_width=2)
+keyboard_yes_no.add(types.KeyboardButton('Да'))
+keyboard_yes_no.add(types.KeyboardButton('Нет'))
+
+
 keyboard_specialization = types.ReplyKeyboardMarkup(row_width=2)
 keyboard_specialization.add(types.KeyboardButton('specialization_1'))
 keyboard_specialization.add(types.KeyboardButton('specialization_2'))

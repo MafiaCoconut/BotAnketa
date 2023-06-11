@@ -5,7 +5,7 @@ from config import settings
 from config.help_file import *
 from config.log_def import *
 from handlers.authorization import get_fio, get_specialization
-from handlers.admin import check_admin
+from handlers.admin import check_admin, get_questionnaires
 from handlers.questionnaires import save_new_questionare, list_questionnaire, get_list_of_question
 from models.keybords import *
 import pandas as pd
@@ -22,7 +22,7 @@ id_question = None
 answers = []
 
 
-@bot.message_handler(commands=['get_results'])
+@bot.message_handler(commands=['get_results', 'delete'])
 def processing_admin_commands(message):
     function_name = "processing_admin_commands"
     set_func(function_name, tag, status)
@@ -30,8 +30,12 @@ def processing_admin_commands(message):
     if check_admin(message):
         match message.text:
             case "/get_results":
-                main_processing_results(message)
-                bot.register_next_step_handler(message, main_processing_results)
+                help_file.command_admin_panel = "get_results"
+
+            case "/delete":
+                help_file.command_admin_panel = "delete"
+
+        main_processing_admin_panel(message)
 
 
 @bot.message_handler(content_types=['document'])
@@ -48,7 +52,6 @@ def start(message):
     function_name = "start"
     set_func(function_name, tag, status)
 
-    print(message)
     try:
         person = get_person_data_from_id(message.chat.id)
         bot.send_message(message.chat.id, f'Вы уже зарегестрировались {person[3]} {person[2]} {person[1]}', reply_markup=remove_keyboard)
@@ -65,53 +68,95 @@ def help_function(message):
     if check_admin(message):
         pass
     else:
-        bot.send_message(message.chat.id, help_file.rules)
+        bot.send_message(message.chat.id, rules)
 
 
-def main_processing_results(message):
-    if message.text == "/get_results":
-        keyboard_questionnaires = list_questionnaire(message, bot)
-        bot.send_message(message.chat.id, "Чтобы получить результаты анкеты, нажмите необходимую кнопку",
-                         reply_markup=keyboard_questionnaires)
+def main_processing_admin_panel(message):
+    function_name = "main_processing_results"
+    set_func(function_name, tag, status)
+
+    if message.text != "/exit":
+        match help_file.command_admin_panel:
+            case "get_results":
+                if message.text == "/get_results":
+                    get_questionnaires(message, bot)
+                    bot.register_next_step_handler(message, main_processing_admin_panel)
+                else:
+                    path = f"{path_to_answers}{message.text[0]}.xlsx"
+                    with open(path, 'rb') as file:
+                        bot.send_document(message.chat.id, file, reply_markup=remove_keyboard)
+
+            case "delete":
+                if message.text == "/delete":
+                    get_questionnaires(message, bot)
+                    bot.register_next_step_handler(message, main_processing_admin_panel)
+
+                elif help_file.delete_count == 0:
+                    bot.send_message(message.chat.id, f"Вы уверены, что хотите удалить анкету {message.text}",
+                                     reply_markup=keyboard_yes_no)
+                    help_file.delete_count += 1
+                    bot.register_next_step_handler(message, main_processing_admin_panel)
+
+                elif help_file.delete_count == 1:
+                    if message.text == "Да":
+                        help_file.delete_count = 0
+
+                    elif message.text == "Нет":
+                        bot.send_message(message.chat.id, f"Выполнена отмена вызова функции "
+                                                          f"{help_file.command_admin_panel}",
+                                                          reply_markup=remove_keyboard)
+                        help_file.delete_count = 0
+
+                    else:
+                        bot.send_message(message.chat.id, "Вы ввели неправильный формат ответа, повторите попытку ещё "
+                                                          "раз")
+                        bot.register_next_step_handler(message, main_processing_admin_panel)
+
     else:
-        path = f"{path_to_answers}{message.text[0]}.xlsx"
-        with open(path, 'rb') as file:
-            bot.send_document(message.chat.id, file, reply_markup=remove_keyboard)
+        bot.send_message(message.chat.id, f"Выполнена отмена вызова функции {help_file.command_admin_panel}",
+                         reply_markup=remove_keyboard)
 
 
 def work_with_questionnaire(message):
     function_name = "work_with_questionnaire"
     set_func(function_name, tag, status)
 
-    global count_questionnaire, list_of_question, answers, id_question
-    flag_end = False
-    if count_questionnaire == 1:
-        id_question = message.text[0]
-        list_of_question = get_list_of_question(id_question, message, bot)
-        list_of_question.append("end")
-        # print(list_of_question)
-    else:
-        answers.append(message.text)
-
-    text = list_of_question[count_questionnaire].split(' ')
-    if len(text[0]) == 1:
-        bot.send_message(message.chat.id, f"{text[0]}) {' '.join(text[1:])}", reply_markup=remove_keyboard)
-        count_questionnaire += 1
-        text = list_of_question[count_questionnaire].split(' ')
-
-    if len(text[0]) == 5:
-        one_question(message)
-
-    elif text[0] == "end":
-        flag_end = True
-
-    if not flag_end:
-        count_questionnaire += 1
+    if message.text[0] == "/":
+        bot.send_message(message.chat.id, "Вы ввели команду, а не ответ, повторите попытку ещё раз")
+        # flag_right_answer = False
         bot.register_next_step_handler(message, work_with_questionnaire)
+
     else:
-        bot.send_message(message.chat.id, "Ваши данные сохранены", reply_markup=remove_keyboard)
-        set_inside_func(answers, function_name, tag)
-        save_answers(message)
+        global count_questionnaire, list_of_question, answers, id_question
+        flag_end = False
+        # flag_right_answer = True
+        if count_questionnaire == 1:
+            id_question = message.text[0]
+            list_of_question = get_list_of_question(id_question, message, bot)
+            list_of_question.append("end")
+            # print(list_of_question)
+        else:
+            answers.append(message.text)
+
+        text = list_of_question[count_questionnaire].split(' ')
+        if len(text[0]) == 1:
+            bot.send_message(message.chat.id, f"{text[0]}) {' '.join(text[1:])}", reply_markup=remove_keyboard)
+            count_questionnaire += 1
+            text = list_of_question[count_questionnaire].split(' ')
+
+        if len(text[0]) == 5:
+            one_question(message)
+
+        elif text[0] == "end":
+            flag_end = True
+
+        if not flag_end:
+            count_questionnaire += 1
+            bot.register_next_step_handler(message, work_with_questionnaire)
+        else:
+            bot.send_message(message.chat.id, "Ваши данные сохранены", reply_markup=remove_keyboard)
+            set_inside_func(answers, function_name, tag)
+            save_answers(message)
 
 
 def data_to_default():
@@ -155,21 +200,26 @@ def authorization(message):
     function_name = "authorization"
     set_func(function_name, tag, status)
 
-    match authorization_command:
-        case "1":
-            if get_fio(message, bot):
-                authorization_command_plus_one()
-                authorization(message)
-            else:
-                bot.register_next_step_handler(message, authorization)
+    # print(message)
+    if message.text in ["/behin", "/help"]:
+        bot.send_message(message.chat.id, "Вы ввели команду, а не ответ, повторите попытку ещё раз")
+        bot.register_next_step_handler(message, authorization)
+    else:
+        match authorization_command:
+            case "1":
+                if get_fio(message, bot):
+                    authorization_command_plus_one()
+                    authorization(message)
+                else:
+                    bot.register_next_step_handler(message, authorization)
 
-        case "2":
-            if get_specialization(message, bot):
-                authorization_command_plus_one()
-                bot.send_message(message.chat.id, "Вы успешно зарегестрировались", reply_markup=remove_keyboard)
-                bot.send_message(message.chat.id, help_file.rules)
-            else:
-                bot.register_next_step_handler(message, authorization)
+            case "2":
+                if get_specialization(message, bot):
+                    authorization_command_plus_one()
+                    bot.send_message(message.chat.id, "Вы успешно зарегестрировались", reply_markup=remove_keyboard)
+                    bot.send_message(message.chat.id, help_file.rules)
+                else:
+                    bot.register_next_step_handler(message, authorization)
 
 
 def authorization_command_plus_one():
@@ -202,4 +252,5 @@ if __name__ == '__main__':
 
 # TODO: систему удаления анкеты
 # TODO: спец меню для админа
-# TODO: разобраться с случайным выводом "/begin"
+# TODO: проверка что файл подходит всем условиям
+# TODO: сделать более подробный вывод логов

@@ -9,8 +9,18 @@ def create_markup():
 
 path_to_questions = "data/Questionnaires/"
 path_to_answers = "data/answers/"
-# count_questionnaire = 1
+
+# списка id админов
 list_admins = ['603789543', '991027824']
+
+# тут хранится команда для админ панели
+command_admin_panel = ""  # команда
+
+# счётчик действий для удаления анкеты
+delete_count = 0
+
+# выбранная анкета для удаления
+chose_questioner_to_delete = ""
 
 admin_commands = """Список команд доступных только админу:
 /get_results -  Получить результаты определённой анкеты
