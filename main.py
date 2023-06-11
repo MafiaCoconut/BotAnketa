@@ -9,7 +9,7 @@ from handlers.admin import check_admin, get_questionnaires
 from handlers.questionnaires import save_new_questionare, list_questionnaire, get_list_of_question
 from models.keybords import *
 import pandas as pd
-from models.SQLite import get_person_data_from_id
+from models.SQLite import get_person_data_from_id, delete_id_questioner
 
 bot = telebot.TeleBot("5755365226:AAE9U5AtTrnUpPl5K1EIZxdOgLpl-4AFWDI")
 tag = "main"
@@ -92,14 +92,27 @@ def main_processing_admin_panel(message):
                     bot.register_next_step_handler(message, main_processing_admin_panel)
 
                 elif help_file.delete_count == 0:
-                    bot.send_message(message.chat.id, f"Вы уверены, что хотите удалить анкету {message.text}",
+                    bot.send_message(message.chat.id, f"Вы уверены, что хотите удалить анкету: {message.text}",
                                      reply_markup=keyboard_yes_no)
                     help_file.delete_count += 1
+                    help_file.chose_questioner_to_delete = message.text
                     bot.register_next_step_handler(message, main_processing_admin_panel)
 
                 elif help_file.delete_count == 1:
                     if message.text == "Да":
                         help_file.delete_count = 0
+
+                        id_questioner = help_file.chose_questioner_to_delete[0]
+
+                        path_answer = f"{path_to_answers}{id_questioner}.xlsx"
+                        with open(path_answer, 'rb') as file:
+                            bot.send_document(message.chat.id, file, reply_markup=remove_keyboard)
+                        os.remove(path_answer)
+
+                        path_question = f"{help_file.path_to_questions}/{id_questioner}"
+                        os.remove(path_question)
+
+                        delete_id_questioner(id_questioner)
 
                     elif message.text == "Нет":
                         bot.send_message(message.chat.id, f"Выполнена отмена вызова функции "
@@ -254,3 +267,6 @@ if __name__ == '__main__':
 # TODO: спец меню для админа
 # TODO: проверка что файл подходит всем условиям
 # TODO: сделать более подробный вывод логов
+# TODO: переделать id_question для работы с анкетой - перенести его в help_file
+# TODO: добавить команду в админ панель, чтобы отправлять всем сообщение о новой анкете для прохождения
+

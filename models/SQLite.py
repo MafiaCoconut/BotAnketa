@@ -6,7 +6,7 @@ from config import settings
 from config.log_def import *
 
 tag = "SQLITE_all"
-
+status = "debug"
 
 class SQLite:
     def __init__(self):
@@ -145,14 +145,33 @@ class QuestionnairesSQLite(SQLite):
         data = self.cursor.fetchone()
         return data
 
+    def delete_questioner(self, id_questioner):
+        function_name = "delete_questioner"
+        set_func(function_name, tag)
+
+        condition = f"id = {id_questioner}"
+        query = f"DELETE FROM questionnaires WHERE {condition}"
+        self.cursor.execute(query)
+        self.connection.commit()
+
 
 def get_person_data_from_id(need_id):
     function_name = "get_id"
-    set_func(function_name, tag)
-    person = PersonSQLite()
-    data = person.get_data_from_id(need_id)
-    person.turn_off()
+    set_func(function_name, tag, status)
+    Person = PersonSQLite()
+    data = Person.get_data_from_id(need_id)
+    Person.turn_off()
     return data
+
+
+def delete_id_questioner(id_questioner):
+    function_name = "delete_id_questioner"
+    set_func(function_name, tag, status)
+
+    Questioner = QuestionnairesSQLite()
+    Questioner.delete_questioner(id_questioner)
+    set_inside_func("Удаление произошло успешно", function_name, tag)
+    Questioner.turn_off()
 
 
 def main():
