@@ -48,12 +48,24 @@ def start(message):
     function_name = "start"
     set_func(function_name, tag, status)
 
+    print(message)
     try:
         person = get_person_data_from_id(message.chat.id)
         bot.send_message(message.chat.id, f'Вы уже зарегестрировались {person[3]} {person[2]} {person[1]}', reply_markup=remove_keyboard)
     except:
         bot.send_message(message.chat.id, 'Добро пожаловать!', reply_markup=remove_keyboard)
         authorization(message)
+
+
+@bot.message_handler(commands=['help'])
+def help_function(message):
+    function_name = "help_function"
+    set_func(function_name, tag, status)
+
+    if check_admin(message):
+        pass
+    else:
+        bot.send_message(message.chat.id, help_file.rules)
 
 
 def main_processing_results(message):
@@ -65,19 +77,6 @@ def main_processing_results(message):
         path = f"{path_to_answers}{message.text[0]}.xlsx"
         with open(path, 'rb') as file:
             bot.send_document(message.chat.id, file, reply_markup=remove_keyboard)
-
-
-@bot.message_handler(commands=['list', 'begin'])
-def main_menu(message):
-    function_name = "main_menu"
-    set_func(function_name, tag, status)
-
-    keyboard_questionnaires = list_questionnaire(message, bot)
-    if message.text[1:] == "begin":
-        bot.send_message(message.chat.id,
-                         "Если хотите начать прохождение нажмите на кнопку с названием этой анкеты",
-                         reply_markup=keyboard_questionnaires)
-        bot.register_next_step_handler(message, work_with_questionnaire)
 
 
 def work_with_questionnaire(message):
@@ -180,13 +179,27 @@ def authorization_command_plus_one():
         case "2": authorization_command = "3"
 
 
+@bot.message_handler(commands=['list', 'begin'])
+def main_menu(message):
+    function_name = "main_menu"
+    set_func(function_name, tag, status)
+
+    person = get_person_data_from_id(message.chat.id)
+    if person is not None:
+        keyboard_questionnaires = list_questionnaire(message, bot)
+        if message.text[1:] == "begin":
+            bot.send_message(message.chat.id,
+                             "Если хотите начать прохождение нажмите на кнопку с названием этой анкеты",
+                             reply_markup=keyboard_questionnaires)
+            bot.register_next_step_handler(message, work_with_questionnaire)
+    else:
+        bot.send_message(message.chat.id, "Вы ещё не зарегестрировались, для начала регистрации введите /start")
+
+
 if __name__ == '__main__':
     settings.main()
     bot.polling(none_stop=True, timeout=3000000)
 
 # TODO: систему удаления анкеты
 # TODO: спец меню для админа
-# TODO:
-# TODO:
-# TODO:
-# TODO:
+# TODO: разобраться с случайным выводом "/begin"

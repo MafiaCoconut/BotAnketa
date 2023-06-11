@@ -10,7 +10,7 @@ def create_markup():
 path_to_questions = "data/Questionnaires/"
 path_to_answers = "data/answers/"
 # count_questionnaire = 1
-list_admins = ['603789543', ]
+list_admins = ['603789543', '991027824']
 
 admin_commands = """Список команд доступных только админу:
 /get_results -  Получить результаты определённой анкеты
