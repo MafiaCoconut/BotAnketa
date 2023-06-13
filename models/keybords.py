@@ -1,5 +1,5 @@
 from telebot import types
-
+from help_file import list_of_specialization
 keyboard_authorization = types.ReplyKeyboardMarkup(row_width=2)
 keyboard_authorization.add(types.KeyboardButton('Да, я хочу сохранить'))
 keyboard_authorization.add(types.KeyboardButton('Нет, я хочу изменить'))
@@ -11,9 +11,11 @@ keyboard_yes_no.add(types.KeyboardButton('Нет'))
 
 
 keyboard_specialization = types.ReplyKeyboardMarkup(row_width=2)
-keyboard_specialization.add(types.KeyboardButton('specialization_1'))
-keyboard_specialization.add(types.KeyboardButton('specialization_2'))
-keyboard_specialization.add(types.KeyboardButton('specialization_3'))
+for i in list_of_specialization:
+    keyboard_specialization.add(types.KeyboardButton(i))
+# keyboard_specialization.add(types.KeyboardButton('specialization_1'))
+# keyboard_specialization.add(types.KeyboardButton('specialization_2'))
+# keyboard_specialization.add(types.KeyboardButton('specialization_3'))
 
 
 triple_answer = types.ReplyKeyboardMarkup(row_width=1)
