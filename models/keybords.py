@@ -1,5 +1,5 @@
 from telebot import types
-from help_file import list_of_specialization
+from config.help_file import list_of_specialization
 keyboard_authorization = types.ReplyKeyboardMarkup(row_width=2)
 keyboard_authorization.add(types.KeyboardButton('Да, я хочу сохранить'))
 keyboard_authorization.add(types.KeyboardButton('Нет, я хочу изменить'))

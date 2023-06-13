@@ -1,6 +1,6 @@
 import telebot
 
-import help_file
+import config.help_file as help_file
 from config import settings
 from config.help_file import *
 from config.log_def import *
@@ -56,7 +56,7 @@ def start(message):
 
     try:
         person = get_person_data_from_id(message.chat.id)
-        bot.send_message(message.chat.id, f'Вы уже зарегестрировались {person[3]} {person[2]} {person[1]}', reply_markup=remove_keyboard)
+        bot.send_message(message.chat.id, f'Вы уже зарегестрировались {person[3]} {person[1]} {person[2]}', reply_markup=remove_keyboard)
     except:
         bot.send_message(message.chat.id, 'Добро пожаловать!', reply_markup=remove_keyboard)
         authorization(message)
@@ -151,10 +151,13 @@ def work_with_questionnaire(message):
     set_func(function_name, tag, status)
     try:
         if message.text[0] == "/":
-            bot.send_message(message.chat.id, "Вы ввели команду, а не ответ, повторите попытку ещё раз")
-            set_inside_func(f"Введён неправильный формат ответа: {message.text}", function_name, tag, "warning")
+            if message.text == "/exit":
+                bot.send_message(message.chat.id, "Вы вернулись в главное меню", reply_markup=remove_keyboard)
+            else:
+                bot.send_message(message.chat.id, "Вы ввели команду, а не ответ, повторите попытку ещё раз")
+                set_inside_func(f"Введён неправильный формат ответа: {message.text}", function_name, tag, "warning")
 
-            bot.register_next_step_handler(message, work_with_questionnaire)
+                bot.register_next_step_handler(message, work_with_questionnaire)
 
         else:
             global count_questionnaire, list_of_question, answers
@@ -190,8 +193,9 @@ def work_with_questionnaire(message):
                 bot.send_message(message.chat.id, "Ваши данные сохранены", reply_markup=remove_keyboard)
                 save_answers(message)
     except:
-        bot.send_message(message.chat.id, "Вы отправили не текст")
-        bot.register_next_step_handler(message, work_with_questionnaire)
+        bot.send_message(message.chat.id, "Вы отправили не текст, Вы возвращены в главное меню",
+                         reply_markup=remove_keyboard)
+        # bot.register_next_step_handler(message, work_with_questionnaire)
 
 
 def data_to_default():
@@ -265,8 +269,9 @@ def authorization(message):
                     else:
                         bot.register_next_step_handler(message, authorization)
     except:
-        bot.send_message(message.chat.id, "Вы отправили не текст")
-        bot.register_next_step_handler(message, work_with_questionnaire)
+        bot.send_message(message.chat.id, "Вы отправили не текст, Вы возвращены в главное меню",
+                         reply_markup=remove_keyboard)
+        # bot.register_next_step_handler(message, work_with_questionnaire)
 
 def authorization_command_plus_one():
     global authorization_command
