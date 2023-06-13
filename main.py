@@ -68,9 +68,10 @@ def help_function(message):
     set_func(function_name, tag, status)
     set_person_text(function_name, tag, message)
 
-    # TODO спец /help для админа
     if check_admin(message):
-        pass
+        bot.send_message(message.chat.id, admin_commands)
+        bot.send_message(message.chat.id, application_conditions)
+        bot.send_message(message.chat.id, rules)
     else:
         bot.send_message(message.chat.id, rules)
 
