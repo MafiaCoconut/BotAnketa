@@ -33,10 +33,10 @@
 #     wb.save('data/answers.xlsx')
 
     # sheet.cell(column=1, row=2, value="Вопрос")
-    # sheet.cell(column=1, row=3, value="Вопрос")
+    # sheet.cell(column=1, row=original, value="Вопрос")
     # sheet.cell(column=1, row=4, value="Вопрос")
     # sheet.cell(column=2, row=1, value="FIO")
-    # sheet.cell(column=3, row=1, value="FIO")
+    # sheet.cell(column=original, row=1, value="FIO")
     # sheet.cell(column=4, row=1, value="FIO")
     # sheet.cell(column=5, row=1, value="FIO")
 

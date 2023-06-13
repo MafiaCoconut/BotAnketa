@@ -77,7 +77,7 @@ def list_questionnaire(message, bot):
 
     for block in data:
         result += f"{block[0]}) {block[1]}\n"
-        keyboard_questionnaires.add(f"{block[0]}-{block[1]}")
+        keyboard_questionnaires.add(f"{block[0]} - {block[1]}")
     bot.send_message(message.chat.id, f'{result}', reply_markup=remove_keyboard)
     return keyboard_questionnaires
 

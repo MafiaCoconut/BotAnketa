@@ -27,7 +27,6 @@ def get_fio(message, bot):
     function_name = "get_fio"
     set_func(function_name, tag, status)
 
-    # TODO условие что человек ввёл меньше данных чем нужно
     global flags, data
     match flags["fio"]:
         case 1:
@@ -59,12 +58,16 @@ def get_fio(message, bot):
             set_inside_func(flags["fio"], function_name, tag, status)
 
             text = message.text
-            match text:
-                case "Да, я хочу сохранить":
-                    return True
-                case "Нет, я хочу изменить":
-                    bot.send_message(message.chat.id, "Введите ваше ФИО через пробел", reply_markup=None)
-                    flags["fio"] = 2
+            if text not in ["Да, я хочу сохранить", "Нет, я хочу изменить"]:
+                bot.send_message(message.chat.id, "Вы ввели неправильную команду, повторите попытку ещё раз")
+                # bot.register_next_step_handler(message, authorization)
+            else:
+                match text:
+                    case "Да, я хочу сохранить":
+                        return True
+                    case "Нет, я хочу изменить":
+                        bot.send_message(message.chat.id, "Введите ваше ФИО через пробел", reply_markup=None)
+                        flags["fio"] = 2
     return None
 
 
@@ -86,7 +89,7 @@ def get_specialization(message, bot):
             set_inside_func(flags["specialization"], function_name, tag, status)
 
             text = message.text
-            set_inside_func(f"Специализация: {text}", function_name, tag)
+            set_inside_func(f"Специализация: {text}", function_name, tag, status)
             data["specialization"] = text
 
             bot.send_message(message.chat.id, f"Вы уверены что хотите сохранить: {text}",
@@ -98,22 +101,26 @@ def get_specialization(message, bot):
             set_inside_func(flags["specialization"], function_name, tag, status)
 
             text = message.text
-            match text:
-                case "Да, я хочу сохранить":
-                    save_data(message)
-                    return True
+            if text not in ["Да, я хочу сохранить", "Нет, я хочу изменить"]:
+                bot.send_message(message.chat.id, "Вы ввели неправильную команду, повторите попытку ещё раз")
+                # bot.register_next_step_handler(message, authorization)
+            else:
+                match text:
+                    case "Да, я хочу сохранить":
+                        save_data(message)
+                        return True
 
-                case "Нет, я хочу изменить":
-                    bot.send_message(message.chat.id, "Выберите вашу специальность",
-                                     reply_markup=keyboard_specialization)
-                    flags["specialization"] = 2
+                    case "Нет, я хочу изменить":
+                        bot.send_message(message.chat.id, "Выберите вашу специальность",
+                                         reply_markup=keyboard_specialization)
+                        flags["specialization"] = 2
 
     return None
 
 
 def save_data(message):
     function_name = "save_data"
-    set_func(function_name, tag)
+    set_func(function_name, tag, status)
 
     global data
     person = PersonSQLite()
