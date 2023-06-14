@@ -88,7 +88,7 @@ def get_list_of_question(need_id, message, bot):
 
     questioner = QuestionnairesSQLite()
     data = questioner.get_need_question(need_id)
-    set_inside_func(data, function_name, tag)
+    set_inside_func(data, function_name, tag, status)
 
     path = data[2]
 

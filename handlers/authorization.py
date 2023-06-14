@@ -80,7 +80,7 @@ def get_specialization(message, bot):
         case 1:
             set_inside_func(flags["specialization"], function_name, tag, status)
 
-            bot.send_message(message.chat.id, "Выберите вашу специальность",
+            bot.send_message(message.chat.id, "Выберите ваше название отдела",
                              reply_markup=keyboard_specialization)
 
             flags["specialization"] += 1
@@ -89,7 +89,7 @@ def get_specialization(message, bot):
             set_inside_func(flags["specialization"], function_name, tag, status)
 
             text = message.text
-            set_inside_func(f"Специализация: {text}", function_name, tag, status)
+            set_inside_func(f"Отдел: {text}", function_name, tag, status)
             data["specialization"] = text
 
             bot.send_message(message.chat.id, f"Вы уверены что хотите сохранить: {text}",
@@ -111,7 +111,7 @@ def get_specialization(message, bot):
                         return True
 
                     case "Нет, я хочу изменить":
-                        bot.send_message(message.chat.id, "Выберите вашу специальность",
+                        bot.send_message(message.chat.id, "Выберите ваше название отдела",
                                          reply_markup=keyboard_specialization)
                         flags["specialization"] = 2
 
