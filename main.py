@@ -236,10 +236,20 @@ def one_question(message):
     set_func(function_name, tag, status)
 
     text = list_of_question[count_questionnaire].split(' ')
-    if text[0][4] == '3':
-        bot.send_message(message.chat.id, ' '.join(text[1:]), reply_markup=triple_answer)
+    if text[0][4] == '1':
+        bot.send_message(message.chat.id, ' '.join(text[1:]), reply_markup=answer_1)
+    elif text[0][4] == '2':
+        bot.send_message(message.chat.id, ' '.join(text[1:]), reply_markup=answer_2)
+    elif text[0][4] == '3':
+        bot.send_message(message.chat.id, ' '.join(text[1:]), reply_markup=answer_3)
     elif text[0][4] == '4':
-        bot.send_message(message.chat.id, ' '.join(text[1:]), reply_markup=quad_answer)
+        bot.send_message(message.chat.id, ' '.join(text[1:]), reply_markup=answer_4)
+    elif text[0][4] == '5':
+        bot.send_message(message.chat.id, ' '.join(text[1:]), reply_markup=answer_5)
+    elif text[0][4] == '6':
+        bot.send_message(message.chat.id, ' '.join(text[1:]), reply_markup=answer_6)
+    elif text[0][4] == '7':
+        bot.send_message(message.chat.id, ' '.join(text[1:]), reply_markup=answer_7)
 
 
 def authorization(message):
@@ -301,7 +311,8 @@ def main_menu(message):
 
 if __name__ == '__main__':
     settings.main()
-    bot.polling(none_stop=True, timeout=3000000)
+    # bot.polling(none_stop=True, timeout=3000000)
+    bot.polling(none_stop=True)
 
 # TODO: спец меню для админа
 # TODO: проверка что файл подходит всем условиям

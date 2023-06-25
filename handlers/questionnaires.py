@@ -44,7 +44,7 @@ def save_new_questionare(message, bot):
 
     save_data(message, bot, link)
 
-    with open(link, 'r') as file:
+    with open(link, 'r', encoding="utf-8") as file:
         content = file.read()
 
     context = content.split("\n")
@@ -92,7 +92,7 @@ def get_list_of_question(need_id, message, bot):
 
     path = data[2]
 
-    with open(path, 'r') as file:
+    with open(path, 'r', encoding="utf-8") as file:
         result = file.read()
 
     list_of_question = result.split("\n")
